@@ -31,6 +31,7 @@
 
   
     <link rel="top" title="Titan Docs 1.0.1 documentation" href="index.html"/>
+        <link rel="next" title="First Steps" href="first_steps.html"/>
         <link rel="prev" title="Welcome to Titan Docs!" href="index.html"/> 
 
   
@@ -81,7 +82,15 @@
             
             
                 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Getting Started</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#logging-in">Logging In</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#remote-login">Remote Login</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#automatic-login-optional">Automatic Login (Optional)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="first_steps.html">First Steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cosmotransitions_simulation_example.html">cosmoTransitions Example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="madgraph_simulation_example.html">MadGraph Example</a></li>
 </ul>
 
             
@@ -128,7 +137,91 @@
             
   <div class="section" id="getting-started">
 <h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
-<p>This page is intended as to get you started!</p>
+<p>This section is designed to just help get you logged into the titan cluster.</p>
+<div class="section" id="logging-in">
+<h2>Logging In<a class="headerlink" href="#logging-in" title="Permalink to this headline">¶</a></h2>
+<p>The first step in working with titan is to contact <a class="reference external" href="mailto:babcock&#37;&#52;&#48;physics&#46;umass&#46;edu">Joe</a> to request</p>
+<ul class="simple">
+<li>a titan account as a member of the ACFI theory group</li>
+<li>a space on the /data2 disk (as far as I know, this is the most stable disk for analysis)</li>
+</ul>
+<p>In the request, you should include your preferred username. Once your account is created, you&#8217;ll receive a temporary password. In order to change this to a password of your own choice, you&#8217;ll need to log onto titan. To do this, first make sure you are logged onto the Physics wifi network <a class="footnote-reference" href="#id4" id="id1">[1]</a>. Then open a terminal <a class="footnote-reference" href="#id5" id="id2">[2]</a> and type the following</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">ssh</span> <span class="n">username</span><span class="nd">@titan</span><span class="o">.</span><span class="n">physics</span><span class="o">.</span><span class="n">umass</span><span class="o">.</span><span class="n">edu</span>
+</pre></div>
+</div>
+<p>where username should be replaced by your chosen username. If this is your first time logging into titan, you will most likely see the following warning</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>The authenticity of host XXX.XXX.X.XXX (XXX.XXX.X.XXX) cannot be established. RSA key fingerprint is XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX. Are you sure you want to continue connecting (yes/no)?
+</pre></div>
+</div>
+<p>This warning can safely be ignored. Just type yes, press enter, and you should then be logged into titan. In order to change your password, type the following</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">passwd</span>
+</pre></div>
+</div>
+<p>This will first prompt you for your current password (your temporary password) and then for your preferred password. Once that&#8217;s done, you should then give your preferred password whenever you log into titan via the ssh command above.</p>
+<p>While in titan, you will be forced to use the terminal for everything. If you aren&#8217;t familiar with the unix terminal utility and what you can do with it, <a class="reference external" href="https://community.linuxmint.com/tutorial/view/244">this</a> is a handy reference but google is likely your best friend here.</p>
+</div>
+<div class="section" id="remote-login">
+<span id="id3"></span><h2>Remote Login<a class="headerlink" href="#remote-login" title="Permalink to this headline">¶</a></h2>
+<p>If you are away from the ACFI or can&#8217;t login into the Physics wifi network, then there is a backdoor method for logging into titan. This consists of first logging into a server which is already onsite at LGRT called stepa0 and then, from there, logging into titan. To log onto stepa0, open a terminal and type</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">ssh</span> <span class="n">everybody</span><span class="nd">@stepa0</span><span class="o">.</span><span class="n">physics</span><span class="o">.</span><span class="n">umass</span><span class="o">.</span><span class="n">edu</span>
+</pre></div>
+</div>
+<p>When prompted for a password, use <strong>406Amherst</strong>. Once into the remote server, then log into titan the standard way.</p>
+</div>
+<div class="section" id="automatic-login-optional">
+<h2>Automatic Login (Optional)<a class="headerlink" href="#automatic-login-optional" title="Permalink to this headline">¶</a></h2>
+<p>Logging into stepa0 first and then titan from there can get annoying after a little while with all the typing. In order to simplify the process somewhat, you can setup an automatic logins. To do this, open a terminal on your local machine and cd into your <strong>~/.ssh</strong> folder. Here, you can create a public/private rsa key pair by typing</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">ssh</span><span class="o">-</span><span class="n">keygen</span>
+</pre></div>
+</div>
+<p>It will then give you the prompt: <em>Enter file in which to save the key</em>. I recommend choosing a convenient filename here, such as <strong>id_rsa_umass</strong>. You&#8217;ll then be prompted for a passphrase. Just press enter without writing anything (no passphrase is assigned). This isn&#8217;t needed as long as you&#8217;re careful with your own local machine and it also allows you to call ssh from within a shell script. If this was successful, you should see something resembling the following</p>
+<img alt="_images/rsapair_output.png" src="_images/rsapair_output.png" />
+<p>This process will create two files, <strong>id_rsa_umass</strong> and <strong>id_rsa_umass.pub</strong>. While still in the <strong>~/.ssh</strong> folder, open the config file with your favorite text editor (if no config file exists yet, just create it) and write the following lines at the end of it</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Host</span> <span class="n">everybody</span>
+        <span class="n">User</span> <span class="n">everybody</span>
+        <span class="n">Hostname</span> <span class="n">stepa0</span><span class="o">.</span><span class="n">physics</span><span class="o">.</span><span class="n">umass</span><span class="o">.</span><span class="n">edu</span>
+        <span class="n">IdentityFile</span> <span class="o">~/.</span><span class="n">ssh</span><span class="o">/</span><span class="n">id_rsa_umass</span>
+        <span class="n">ServerAliveInterval</span> <span class="mi">10</span>
+</pre></div>
+</div>
+<p>and save and close it. You now need to copy the public key to the remote host. To do this, type</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">scp</span> <span class="n">id_rsa_umass</span><span class="o">.</span><span class="n">pub</span> <span class="n">everybody</span><span class="nd">@stepa0</span><span class="o">.</span><span class="n">physics</span><span class="o">.</span><span class="n">umass</span><span class="o">.</span><span class="n">edu</span><span class="p">:</span><span class="o">~/.</span><span class="n">ssh</span><span class="o">/</span>
+</pre></div>
+</div>
+<p>using the above password when prompted and then ssh into stepa0 and cd into <strong>~/.ssh</strong>. You should now see your id_rsa_umass.pub key as well as an <strong>authorized_keys2</strong> file. In order to insert your public key into the list of authorized keys, type</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">cat</span> <span class="n">id_rsa_umass</span><span class="o">.</span><span class="n">pub</span> <span class="o">&gt;&gt;</span> <span class="n">authorized_keys2</span>
+</pre></div>
+</div>
+<p>We can now further simplify the step into titan by adding the following lines to the <strong>config</strong> file in the <strong>~/.ssh</strong> folder</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Host</span> <span class="n">titan</span>
+        <span class="n">User</span> <span class="n">username</span>
+        <span class="n">Hostname</span> <span class="n">titan</span><span class="o">.</span><span class="n">physics</span><span class="o">.</span><span class="n">umass</span><span class="o">.</span><span class="n">edu</span>
+</pre></div>
+</div>
+<p>with <strong>username</strong> replaced with your chosen titan username.</p>
+<p>If you now start a new terminal on your local machine, you should be able to simply type</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">ssh</span> <span class="n">everybody</span>
+</pre></div>
+</div>
+<p>to get into stepa0 without a password from your local machine. Once there, you should be to type</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">ssh</span> <span class="n">titan</span>
+</pre></div>
+</div>
+<p>to log into titan, after you insert your titan password when prompted.</p>
+<p><strong>Note:</strong> <em>it&#8217;s possible to repeat the procedure to log into stepa0 without a password for titan as well. However, in the interest of security, I&#8217;d recommend against this.</em></p>
+<table class="docutils footnote" frame="void" id="id4" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>If you haven&#8217;t gotten access to this network yet, the network is down (it happens...), or you&#8217;re currently not at the ACFI go to <a class="reference internal" href="#remote-login"><span class="std std-ref">Remote Login</span></a>.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id5" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id2">[2]</a></td><td>In OSX, this is in your Applications/Utilities folder. For PC users, I would recommend installing <a class="reference external" href="http://www.ubuntu.com/">ubuntu</a> alongside windows either as a dual boot or installation within windows.</td></tr>
+</tbody>
+</table>
+</div>
 </div>
 
 
@@ -137,6 +230,8 @@
           <footer>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="first_steps.html" class="btn btn-neutral float-right" title="First Steps" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="index.html" class="btn btn-neutral" title="Welcome to Titan Docs!" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>

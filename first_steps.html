@@ -1,0 +1,240 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>First Steps &mdash; Titan Docs 1.0.1 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Titan Docs 1.0.1 documentation" href="index.html"/>
+        <link rel="next" title="cosmoTransitions Example" href="cosmotransitions_simulation_example.html"/>
+        <link rel="prev" title="Getting Started" href="getting_started.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Titan Docs
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">First Steps</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#basic-understanding">Basic Understanding</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#first-time-setup">First Time Setup</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="cosmotransitions_simulation_example.html">cosmoTransitions Example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="madgraph_simulation_example.html">MadGraph Example</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">Titan Docs</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>First Steps</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/first_steps.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="first-steps">
+<h1>First Steps<a class="headerlink" href="#first-steps" title="Permalink to this headline">¶</a></h1>
+<p>Once you&#8217;ve logged into titan, there are still a few things that need to be done before you can run simulations.</p>
+<div class="section" id="basic-understanding">
+<h2>Basic Understanding<a class="headerlink" href="#basic-understanding" title="Permalink to this headline">¶</a></h2>
+<p>The UMass cluster consists of a head node named <strong>titan.physics.umass.edu</strong> along with a series of nodes named <strong>titan31</strong>, <strong>titan32</strong>, <strong>titan33</strong>,... . Following the instructions in <a class="reference internal" href="getting_started.html"><span class="doc">Getting Started</span></a> gets you onto the head node. From there, you have access to and can submit jobs to any of the other nodes.</p>
+<p>Batch job management is done with Torque (OpenPBS). Jobs are submitted by users with the qsub command and are scheduled to run using a fair-share algorithm which prioritizes jobs based on all users&#8217; recent cpu utilization. This means, for example, that a user who wants to run a few quick jobs will not have to wait for another user who has hundreds of 10-hour long jobs already in the system.</p>
+<p>To learn more about the UMass Tier 3 cluster see <a class="reference external" href="https://twiki.cern.ch/twiki/bin/view/Main/UMassCluster">here</a>. To learn more about Torque and job scheduling/management on the UMass cluster see <a class="reference external" href="https://twiki.cern.ch/twiki/bin/view/Main/OpenPBS">here</a>.</p>
+</div>
+<div class="section" id="first-time-setup">
+<h2>First Time Setup<a class="headerlink" href="#first-time-setup" title="Permalink to this headline">¶</a></h2>
+<p>Once you&#8217;ve logged into titan, you should be in your home directory <a class="footnote-reference" href="#id3" id="id2">[1]</a>. Here you should find a <strong>.zshenv</strong> file (if there is none, then just create it). Open it with your favorite text editor and insert the following lines</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span># cvmfs Tier 3 env setup
+export ATLAS_LOCAL_ROOT_BASE=/cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase
+alias setupATLAS=&#39;source ${ATLAS_LOCAL_ROOT_BASE}/user/atlasLocalSetup.sh&#39;
+export ALRB_localConfigDir=$HOME/localConfig
+</pre></div>
+</div>
+<p>Once this is done, save and exit. In order for the changes to take effect in your current shell, type</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">source</span> <span class="o">~/.</span><span class="n">zshenv</span>
+</pre></div>
+</div>
+<p>Before doing any analysis, you&#8217;ll always want to cd to your folder on the /data2 disk. Once here, you should check to make sure that the node you&#8217;re on (should be the titan node) is up to date and running SLC6. To do this, run the following commands</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">cat</span> <span class="o">/</span><span class="n">etc</span><span class="o">/*-</span><span class="n">release</span>
+</pre></div>
+</div>
+<table class="docutils footnote" frame="void" id="id3" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id2">[1]</a></td><td>You can check this with the <strong>pwd</strong> command, which should return <strong>/home/username</strong>.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="cosmotransitions_simulation_example.html" class="btn btn-neutral float-right" title="cosmoTransitions Example" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="getting_started.html" class="btn btn-neutral" title="Getting Started" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Peter Winslow.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'1.0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
