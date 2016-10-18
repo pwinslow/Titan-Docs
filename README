@@ -1,0 +1,1 @@
+This repository holds all files associated with a web-based tutorial for the ACFI theory group on running distributed cosmoTransitions and MadGraph+PYTHIA+Delphes simulations on the titan cluster at UMass Amherst. The online version of this website can be found [here](https://pwinslow.github.io/Titan-Docs/).  
