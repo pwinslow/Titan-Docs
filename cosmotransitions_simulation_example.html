@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cosmoTransitions Example &mdash; Titan Docs 1.0.1 documentation</title>
+  <title>Parallelized cosmoTransitions Simulations &mdash; Titan Docs 1.0.1 documentation</title>
   
 
   
@@ -84,7 +84,15 @@
                 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="first_steps.html">First Steps</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">cosmoTransitions Example</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Parallelized cosmoTransitions Simulations</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#preliminaries">Preliminaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#installing-cosmotransitions">Installing cosmoTransitions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#setting-up-for-parallelized-simulation">Setting up for Parallelized Simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#parallelized-simulation">Parallelized Simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#cleanup-and-results">Cleanup and Results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#final-comments">Final Comments</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="madgraph_simulation_example.html">MadGraph Example</a></li>
 </ul>
 
@@ -116,7 +124,7 @@
   <ul class="wy-breadcrumbs">
     <li><a href="index.html">Docs</a> &raquo;</li>
       
-    <li>cosmoTransitions Example</li>
+    <li>Parallelized cosmoTransitions Simulations</li>
       <li class="wy-breadcrumbs-aside">
         
           
@@ -130,8 +138,219 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="cosmotransitions-example">
-<h1>cosmoTransitions Example<a class="headerlink" href="#cosmotransitions-example" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="parallelized-cosmotransitions-simulations">
+<h1>Parallelized cosmoTransitions Simulations<a class="headerlink" href="#parallelized-cosmotransitions-simulations" title="Permalink to this headline">¶</a></h1>
+<p>The cosmoTransitions package is a set of python modules for calculating properties of effective potentials based on user-defined models with one or more scalar fields. Most importantly, it can be used to find the instanton solutions which interpolate between different vacua in a given theory, allowing one to determine the probability for a vacuum transition. For more details on the inner workings of cosmoTransitions, on how to implement your own model, and more, there&#8217;s no better source than the original <a class="reference external" href="http://clwainwright.github.io/CosmoTransitions/">documentation</a> by the author himself.</p>
+<div class="section" id="preliminaries">
+<h2>Preliminaries<a class="headerlink" href="#preliminaries" title="Permalink to this headline">¶</a></h2>
+<p>For this tutorial, we&#8217;ll take advantage of a simple two scalar model included in the standard cosmoTransitions package for testing purposes. This model doesn&#8217;t have any physical significance. Instead, simply exists to test and highlight some of the features of the cosmoTransitions package. It consists of two scalar fields, labeled <strong>phi1</strong> and <strong>phi2</strong>, which mix and an extra boson whose mass depends on both fields. There are six parameters used to characterize the potential of this model which are</p>
+<ul class="simple">
+<li>m1: Tree-level mass of phi1 when mu = 0</li>
+<li>m2: Tree-level mass of phi2 when mu = 0</li>
+<li>mu: Mass coefficient for the phi1-phi2 mixing term</li>
+<li>Y1: Coupling of the extra boson to the two scalars individually</li>
+<li>Y2: Coupling to the two scalars together</li>
+<li>n: Degrees of freedom of the extra boson</li>
+</ul>
+<p>In what follows, we&#8217;ll perform a parallelized Monte Carlo simulation of the parameter space for this model.</p>
+</div>
+<div class="section" id="installing-cosmotransitions">
+<h2>Installing cosmoTransitions<a class="headerlink" href="#installing-cosmotransitions" title="Permalink to this headline">¶</a></h2>
+<p>By far, the easiest way to obtain cosmoTransitions is to directly clone the repository from github. To do this, simply log into titan and then cd to the place where you would like cosmoTransitions to be installed, e.g., in your home directory. Once there, type</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">clwainwright</span><span class="o">/</span><span class="n">CosmoTransitions</span><span class="o">.</span><span class="n">git</span>
+</pre></div>
+</div>
+<p>If everything worked, there should be a new folder called <code class="docutils literal"><span class="pre">CosmoTransitions</span></code>. Since the cosmoTransitions package is simply a collection of python modules, it is now effectively installed and ready for use as long as you have previously installed python as described in <a class="reference internal" href="first_steps.html"><span class="doc">First Steps</span></a>.</p>
+<p>The model file that we&#8217;ll use is in the <code class="docutils literal"><span class="pre">CosmoTransitions/test</span></code> folder and is called <code class="docutils literal"><span class="pre">testModel1.py</span></code>. We can perform a practice simulation of the phase history of this model for the default parameter values by creating a copy of this file in the <code class="docutils literal"><span class="pre">CosmoTransitions</span></code> folder and running it in an ipython shell. To do this, first, while in the <code class="docutils literal"><span class="pre">CosmoTransitions</span></code> folder, type <code class="docutils literal"><span class="pre">cp</span> <span class="pre">test/testModel1.py</span> <span class="pre">.</span></code> and then open an ipython shell by typing <code class="docutils literal"><span class="pre">ipython</span></code> at the terminal prompt. After this, perform the simulation by typing the following commands</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">testModel1</span> <span class="k">import</span> <span class="n">model1</span>
+<span class="n">m</span> <span class="o">=</span> <span class="n">model1</span><span class="p">()</span>
+<span class="n">alltrans</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">findAllTransitions</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>This creates an instance of the model, runs cosmoTransitions, and saves the phase history in the variable <code class="docutils literal"><span class="pre">alltrans</span></code>. For the default parameters, this history includes two phase transitions which can be accessed by typing either <code class="docutils literal"><span class="pre">alltrans[0]</span></code> or <code class="docutils literal"><span class="pre">alltrans[1]</span></code>. Each of these is a python dictionary from which the information on the given transition can be extracted by referencing the appropriate key, e.g., typing <code class="docutils literal"><span class="pre">alltrans[0]['trantype'],</span> <span class="pre">alltrans[1]['trantype']</span></code> will return <code class="docutils literal"><span class="pre">(2,1)</span></code> which indicates that the high (low) temperature transition was 2nd- (1st-) order. To exit the ipython shell just type <code class="docutils literal"><span class="pre">exit</span></code>. In the next subsection, we&#8217;ll see how to setup a Monte Carlo simulation of the parameter space using the titan cluster.</p>
+</div>
+<div class="section" id="setting-up-for-parallelized-simulation">
+<h2>Setting up for Parallelized Simulation<a class="headerlink" href="#setting-up-for-parallelized-simulation" title="Permalink to this headline">¶</a></h2>
+<p>To begin, in the CosmoTransitions folder create two folders, one named <code class="docutils literal"><span class="pre">analysis</span></code> and the other named <code class="docutils literal"><span class="pre">data</span></code>. Once this is done, cd into the analysis folder, open a text editor, copy/paste the following script into it</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pandas</span> <span class="k">import</span> <span class="n">DataFrame</span>
+<span class="kn">from</span> <span class="nn">numpy.random</span> <span class="k">import</span> <span class="n">randint</span><span class="p">,</span> <span class="n">uniform</span>
+
+<span class="k">def</span> <span class="nf">generate_points</span><span class="p">(</span><span class="n">num_points</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">randN</span><span class="p">(</span><span class="n">initial_point</span><span class="p">,</span> <span class="n">final_point</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">kind</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">kind</span> <span class="o">==</span> <span class="s1">&#39;integer&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">randint</span><span class="p">(</span><span class="n">initial_point</span><span class="p">,</span> <span class="n">final_point</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">N</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">kind</span> <span class="o">==</span> <span class="s1">&#39;float&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">uniform</span><span class="p">(</span><span class="n">initial_point</span><span class="p">,</span> <span class="n">final_point</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">N</span><span class="p">)</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;m1&#39;</span><span class="p">:</span> <span class="n">randN</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">150</span><span class="p">,</span> <span class="n">num_points</span><span class="p">,</span> <span class="s1">&#39;float&#39;</span><span class="p">),</span>
+                    <span class="s1">&#39;m2&#39;</span><span class="p">:</span> <span class="n">randN</span><span class="p">(</span><span class="mi">25</span><span class="p">,</span> <span class="mi">75</span><span class="p">,</span> <span class="n">num_points</span><span class="p">,</span> <span class="s1">&#39;float&#39;</span><span class="p">),</span>
+                    <span class="s1">&#39;mu&#39;</span><span class="p">:</span> <span class="n">randN</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="n">num_points</span><span class="p">,</span> <span class="s1">&#39;float&#39;</span><span class="p">),</span>
+                    <span class="s1">&#39;Y1&#39;</span><span class="p">:</span> <span class="n">randN</span><span class="p">(</span><span class="o">.</span><span class="mi">05</span><span class="p">,</span> <span class="o">.</span><span class="mi">25</span><span class="p">,</span> <span class="n">num_points</span><span class="p">,</span> <span class="s1">&#39;float&#39;</span><span class="p">),</span>
+                    <span class="s1">&#39;Y2&#39;</span><span class="p">:</span> <span class="n">randN</span><span class="p">(</span><span class="o">.</span><span class="mi">05</span><span class="p">,</span> <span class="o">.</span><span class="mi">25</span><span class="p">,</span> <span class="n">num_points</span><span class="p">,</span> <span class="s1">&#39;float&#39;</span><span class="p">),</span>
+                    <span class="s1">&#39;n&#39;</span><span class="p">:</span> <span class="n">randN</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="n">num_points</span><span class="p">,</span> <span class="s1">&#39;integer&#39;</span><span class="p">)})</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;m1&#39;</span><span class="p">,</span> <span class="s1">&#39;m2&#39;</span><span class="p">,</span> <span class="s1">&#39;mu&#39;</span><span class="p">,</span> <span class="s1">&#39;Y1&#39;</span><span class="p">,</span> <span class="s1">&#39;Y2&#39;</span><span class="p">,</span> <span class="s1">&#39;n&#39;</span><span class="p">]]</span>
+
+    <span class="k">return</span> <span class="n">df</span>
+
+<span class="k">for</span> <span class="n">cnt</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>
+    <span class="n">points</span> <span class="o">=</span> <span class="n">generate_points</span><span class="p">(</span><span class="mi">25</span><span class="p">)</span>
+    <span class="n">points</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s1">&#39;../data/inputfile_</span><span class="si">%d</span><span class="s1">.csv&#39;</span> <span class="o">%</span> <span class="n">cnt</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>and save it as <code class="docutils literal"><span class="pre">generate_points.py</span></code>. This script defines a function, <strong>generate_points</strong>, which generates <em>num_points</em> random choices for the six parameters in the scalar potential of our model. At the bottom of the script is a for loop which generates 5 separate files with 25 parameter points in each and exports them, in csv format, to the <strong>data</strong> folder. To run this, simply type <code class="docutils literal"><span class="pre">python</span> <span class="pre">generate_points.py</span></code> while in the analysis folder. If it ran correctly, then you should see 5 separate csv files in the data folder with 25 points in each.</p>
+<p>Next, while still in the analysis folder, open a new text editor, copy/paste the following script into it</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="k">import</span> <span class="n">DataFrame</span>
+<span class="kn">from</span> <span class="nn">testModel1</span> <span class="k">import</span> <span class="n">model1</span>
+
+<span class="n">jobPATH</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">jobPATH</span> <span class="o">+</span> <span class="s1">&#39;/inputfile.csv&#39;</span><span class="p">)</span>
+
+<span class="n">trans_data</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">instance_count</span><span class="p">,</span> <span class="n">instance</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="p">):</span>
+        <span class="n">m1</span><span class="p">,</span> <span class="n">m2</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">Y1</span><span class="p">,</span> <span class="n">Y2</span><span class="p">,</span> <span class="n">n</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">instance</span><span class="p">)</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">model1</span><span class="p">(</span><span class="n">m1</span><span class="o">=</span><span class="n">m1</span><span class="p">,</span> <span class="n">m2</span><span class="o">=</span><span class="n">m2</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">mu</span><span class="p">,</span> <span class="n">Y1</span><span class="o">=</span><span class="n">Y1</span><span class="p">,</span> <span class="n">Y2</span><span class="o">=</span><span class="n">Y2</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+                <span class="n">alltrans</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">findAllTransitions</span><span class="p">()</span>
+        <span class="k">except</span><span class="p">:</span>
+                <span class="k">continue</span>
+        <span class="k">else</span><span class="p">:</span>
+                <span class="n">alltrans</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">alltrans</span> <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">alltrans</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">trans_dict</span> <span class="o">=</span> <span class="p">{}</span>
+                        <span class="k">for</span> <span class="n">trans_count</span><span class="p">,</span> <span class="n">trans</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">alltrans</span><span class="p">):</span>
+                                <span class="k">try</span><span class="p">:</span>
+                                        <span class="n">trans_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Critical Temperature&#39;</span><span class="p">:</span> <span class="n">trans</span><span class="p">[</span><span class="s1">&#39;crit_trans&#39;</span><span class="p">][</span><span class="s1">&#39;Tcrit&#39;</span><span class="p">],</span>
+                                                      <span class="s1">&#39;Nucleation Temperature&#39;</span><span class="p">:</span> <span class="n">trans</span><span class="p">[</span><span class="s1">&#39;Tnuc&#39;</span><span class="p">],</span>
+                                                      <span class="s1">&#39;Action&#39;</span><span class="p">:</span> <span class="n">trans</span><span class="p">[</span><span class="s1">&#39;action&#39;</span><span class="p">],</span>
+                                                      <span class="s1">&#39;phi1 High VEV&#39;</span><span class="p">:</span> <span class="n">trans</span><span class="p">[</span><span class="s1">&#39;high_vev&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+                                                      <span class="s1">&#39;phi1 Low VEV&#39;</span><span class="p">:</span> <span class="n">trans</span><span class="p">[</span><span class="s1">&#39;low_vev&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+                                                      <span class="s1">&#39;phi2 High VEV&#39;</span><span class="p">:</span> <span class="n">trans</span><span class="p">[</span><span class="s1">&#39;high_vev&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span>
+                                                      <span class="s1">&#39;phi2 Low VEV&#39;</span><span class="p">:</span> <span class="n">trans</span><span class="p">[</span><span class="s1">&#39;low_vev&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]}</span>
+                                <span class="k">except</span><span class="p">:</span>
+                                        <span class="k">continue</span>
+
+                        <span class="n">trans_data</span><span class="p">[</span><span class="n">instance_count</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;m1&#39;</span><span class="p">:</span> <span class="n">m1</span><span class="p">,</span> <span class="s1">&#39;m2&#39;</span><span class="p">:</span> <span class="n">m2</span><span class="p">,</span> <span class="s1">&#39;mu&#39;</span><span class="p">:</span> <span class="n">mu</span><span class="p">,</span> <span class="s1">&#39;Y1&#39;</span><span class="p">:</span> <span class="n">Y1</span><span class="p">,</span> <span class="s1">&#39;Y2&#39;</span><span class="p">:</span> <span class="n">Y2</span><span class="p">,</span> <span class="s1">&#39;n&#39;</span><span class="p">:</span> <span class="n">n</span><span class="p">,</span>
+                                                        <span class="s1">&#39;Transition Info&#39;</span><span class="p">:</span> <span class="n">trans_dict</span><span class="p">}</span>
+
+<span class="n">full_df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">trans_data</span><span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
+<span class="n">full_df</span> <span class="o">=</span> <span class="n">full_df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+<span class="n">full_df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">&#39;index&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">full_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">jobPATH</span> <span class="o">+</span> <span class="s1">&#39;/outputfile.csv&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>and save it as <code class="docutils literal"><span class="pre">runner.py</span></code>. Given the correct path at runtime, this script will read a csv file of random parameter points, extract the phase history for each one, and output all the results to another csv file in the same path.</p>
+<p>By running <code class="docutils literal"><span class="pre">runner.py</span></code> on each of the 5x25=125 parameter points, we can scan the phase history of this model as a function of the full parameter space. However, by setting up 5 separate instances of it which simultaneously run on one of the 5 csv files created by <code class="docutils literal"><span class="pre">generate_points.py</span></code>, we can reduce our running time by roughly 1/5. In the next subsection, this is what we&#8217;ll do.</p>
+</div>
+<div class="section" id="parallelized-simulation">
+<h2>Parallelized Simulation<a class="headerlink" href="#parallelized-simulation" title="Permalink to this headline">¶</a></h2>
+<p>So far, in the <code class="docutils literal"><span class="pre">CosmoTransitions</span></code> folder, there is an analysis folder and a data folder. The analysis folder should contain both <code class="docutils literal"><span class="pre">generate_points.py</span></code> and <code class="docutils literal"><span class="pre">runner.py</span></code> and the data folder should contain 5 csv files. Now, while in the <code class="docutils literal"><span class="pre">CosmoTransitions</span></code> folder, open a text editor, copy and paste the following script into it</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>#/bin/sh
+
+# Define some paths
+cosmoBase=&quot;$HOME/CosmoTransitions&quot;
+cosmoDataBase=$cosmoBase&quot;/data&quot;
+cosmoAnalysisBase=$cosmoBase&quot;/analysis&quot;
+cosmoJobBase=$cosmoBase&quot;/jobs&quot;
+
+# Create folder to run jobs and cd into it
+mkdir $cosmoJobBase
+cd $cosmoJobBase
+
+# Get number of data inputfiles
+numfiles=($cosmoDataBase/*)
+numfiles=${#numfiles[@]}
+
+# Begin loop
+for (( i=0; i&lt;$numfiles; i++ ));
+do
+
+# Define a folder for a job and cp all necessary files to this location
+JobBase=$cosmoJobBase&quot;/job$i&quot;
+mkdir $JobBase
+cp -r $cosmoBase&quot;/cosmoTransitions&quot; $cosmoAnalysisBase&quot;/runner.py&quot; $cosmoBase&quot;/test/testModel1.py&quot; $JobBase
+cp $cosmoDataBase&quot;/inputfile_$i.csv&quot; $JobBase&quot;/inputfile.csv&quot;
+cd $JobBase
+
+# Create a bash script for batch submission
+################################################################
+echo &quot;&quot; &gt;&gt; bout.log
+echo &quot;&quot; &gt;&gt; berr.log
+
+echo &quot;#!/bin/bash&quot; &gt;&gt; script.sh
+echo &quot;#PBS -N Job$i&quot; &gt;&gt; script.sh
+echo &quot;echo &#39;seed: $i&#39;&quot; &gt;&gt; script.sh
+echo &quot;printenv&quot; &gt;&gt; script.sh
+echo &quot;&quot; &gt;&gt; script.sh
+echo &#39;echo &quot;Running cosmoTransitions&quot;&#39; &gt;&gt; script.sh
+echo &quot;PYTHONPATH=$HOME/local/anaconda/lib/python2.7/site-packages $HOME/local/anaconda/bin/python $JobBase/runner.py $JobBase&quot; &gt;&gt; script.sh
+################################################################
+
+
+# Submit bash script
+chmod +x script.sh
+qsub -e berr.log -o bout.log script.sh
+
+# Exit loop
+done
+</pre></div>
+</div>
+<p>and save it as <code class="docutils literal"><span class="pre">run_cosmo_jobs</span></code>. As before, make it an executable with <code class="docutils literal"><span class="pre">chmod</span> <span class="pre">+x</span> <span class="pre">run_cosmo_jobs</span></code>. <code class="docutils literal"><span class="pre">run_cosmo_jobs</span></code> creates five folders with each containing one of the csv files created by <code class="docutils literal"><span class="pre">generate_points.py</span></code>, a copy of <code class="docutils literal"><span class="pre">runner.py</span></code>, a copy of the cosmoTransitions package, our model file, and a bash script. This bash script submits a job to the titan cluster which consists of running the local version of <code class="docutils literal"><span class="pre">runner.py</span></code> on the given csv file. The <code class="docutils literal"><span class="pre">qsub</span></code> cmd is what submits this job to cluster instead of running it locally.</p>
+<p>Now, if everything has been setup correctly, then you should be able to perform parallel Monte Carlo simulations of the parameter space by running the previous script as <code class="docutils literal"><span class="pre">./run_cosmo_jobs</span></code> from the <code class="docutils literal"><span class="pre">CosmoTransitions</span></code> folder. If everything worked correctly, you should see output similar to the following</p>
+<img alt="_images/runjob_pic.png" src="_images/runjob_pic.png" />
+<p>Your jobs should now be running on the titan cluster. While they&#8217;re running, you can check on them using the <code class="docutils literal"><span class="pre">qstat</span></code> cmd which should return output similar to the following</p>
+<img alt="_images/qstat_pic.png" src="_images/qstat_pic.png" />
+<p>For more interface options with running jobs, see any of the links <a class="reference external" href="https://www.google.ca/webhp?sourceid=chrome-instant&amp;ion=1&amp;espv=2&amp;ie=UTF-8#q=pbs%20cluster%20commands">here</a>.</p>
+</div>
+<div class="section" id="cleanup-and-results">
+<h2>Cleanup and Results<a class="headerlink" href="#cleanup-and-results" title="Permalink to this headline">¶</a></h2>
+<p>After your jobs have finished running, i.e., they no longer appear when you run <code class="docutils literal"><span class="pre">qstat</span></code>, you&#8217;ll have five <code class="docutils literal"><span class="pre">output.csv</span></code> files containing the results which are spread out among the five folders <code class="docutils literal"><span class="pre">job0</span></code>, <code class="docutils literal"><span class="pre">job1</span></code>, etc. These can be all combined again with a short bash script. To do this, from the <code class="docutils literal"><span class="pre">CosmoTransitions</span></code> folder, copy and paste the following script into a new file</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>#/bin/sh
+
+# Define some paths
+cosmoBase=&quot;$HOME/CosmoTransitions&quot;
+cosmoDataBase=$cosmoBase&quot;/data&quot;
+cosmoJobBase=$cosmoBase&quot;/jobs&quot;
+
+# Get number of data inputfiles
+numfiles=($cosmoDataBase/*)
+numfiles=${#numfiles[@]}
+
+# Define the overall output csv file
+outputFile=$cosmoDataBase&quot;/output.csv&quot;
+
+# Begin loop
+for (( i=0; i&lt;$numfiles; i++ ));
+do
+
+JobBase=$cosmoJobBase&quot;/job$i&quot;
+cat $JobBase&quot;/outputfile.csv&quot; &gt;&gt; $outputFile
+
+done
+</pre></div>
+</div>
+<p>save it as <code class="docutils literal"><span class="pre">clean_cosmo_jobs</span></code> and make it an executable. Running this script will combine all five csv files returned by titan into a single <code class="docutils literal"><span class="pre">output.csv</span></code> file which is then stored in the <code class="docutils literal"><span class="pre">data</span></code> folder for further analysis. We can explore the results stored in this <code class="docutils literal"><span class="pre">output.csv</span></code> file by opening an ipython shell from the <code class="docutils literal"><span class="pre">data</span></code> folder. The following shows a number of commands that can be used to understand and access the results</p>
+<img alt="_images/cleanup_pic.png" src="_images/cleanup_pic.png" />
+<p>First we import the pandas module which is very useful for data analysis. We then read in the <code class="docutils literal"><span class="pre">output.csv</span></code> file in the form of a <a class="reference external" href="http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html">pandas dataframe</a>, which is just a table whose rows and columns are labeled. We then see that out of the 5x25=125 points read in, 76 gave results <a class="footnote-reference" href="#id2" id="id1">[1]</a>. The phase history results for each of the 76 successful cosmoTransitions runs can be accessed via the <code class="docutils literal"><span class="pre">loc</span></code> attribute, e.g., in the image above I&#8217;ve accessed the results from the first successful cosmoTransitions run using <code class="docutils literal"><span class="pre">df.loc[0]</span></code>. Each element of the dataframe returns the original parameter values and a new column called <code class="docutils literal"><span class="pre">Transition</span> <span class="pre">Info</span></code>. The parameter values can be accessed by referencing their name, e.g., the value of Y1 for the first successful run is accessed by <code class="docutils literal"><span class="pre">df.loc[0]['Y1']</span></code>. By referencing the transition info for the first successful run (via <code class="docutils literal"><span class="pre">df.loc[0]['Transition</span> <span class="pre">Info']</span></code>), you can see all the transition info that was stored for each run. These transition attributes can be accessed in a similar way as before, e.g., to access the value of the critical temperature you can use <code class="docutils literal"><span class="pre">df.loc[0]['Transition</span> <span class="pre">Info']['Critical</span> <span class="pre">Temperature']</span></code>.</p>
+</div>
+<div class="section" id="final-comments">
+<h2>Final Comments<a class="headerlink" href="#final-comments" title="Permalink to this headline">¶</a></h2>
+<p>This concludes the tutorial on how to perform distributed Monte Carlo simulations of a cosmoTransitions model on the titan cluster. In order to expand on this for your own research, you&#8217;ll just need to repeat the above procedure with</p>
+<ul class="simple">
+<li>your own model file</li>
+<li>your own <code class="docutils literal"><span class="pre">generate_points.py</span></code> (this should be modified based on the free parameters of your own model and their bounds)</li>
+<li>your own <code class="docutils literal"><span class="pre">runner.py</span></code> (this should be modified based on the free parameters of your own model)</li>
+</ul>
+<p>If you have any questions or problems with the above procedure, feel free to contact <a class="reference external" href="mailto:pwinslow&#37;&#52;&#48;physics&#46;umass&#46;edu">me</a>.</p>
+<table class="docutils footnote" frame="void" id="id2" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>In my experience, this is common when using cosmoTransitions, i.e., for some parameter points cosmoTransitions returns errors associated with numerical instability. Instead of chasing each error as it arises, I&#8217;ve found it easier to simply perform a course grid search of the parameter space and filter those points which lead to errors. This has been incorporated into the <code class="docutils literal"><span class="pre">runner.py</span></code> script in the form of the <code class="docutils literal"><span class="pre">try/except</span></code> clauses.</td></tr>
+</tbody>
+</table>
+</div>
 </div>
 
 
