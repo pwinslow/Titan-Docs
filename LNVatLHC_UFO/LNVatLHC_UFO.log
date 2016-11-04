@@ -1,0 +1,68 @@
+# This file was automatically created by FeynRules $Revision: 845 $
+# Mathematica version: 9.0 for Mac OS X x86 (64-bit) (January 24, 2013)
+# Date: Tue 12 Nov 2013 14:35:04
+
+
+# 
+# This is the logfile for the model LNVatLHC
+
+# Authors: Peter Winslow
+# Model version: 1.0
+# Checking the Lagrangians
+   * All Lagrangians are ok.
+#
+# Particle definitions
+#
+
+   * No particles removed. All particles correspond to GenInt setup.
+
+
+
+# Compulsory PDG codes:
+   * Class SM leptons complete.
+   * Class SM neutrinos complete.
+   * Class SM quarks complete.
+   * Class SM gauge bosons complete.
+#
+# Parameter definitions
+#
+
+   * All parameters are ok.
+
+
+# Vertices
+   * Calling FeynmanRules for 2 Lagrangians.
+   * Number of classes vertices: 36
+   * Number of flavored vertices: 80
+   * Saved vertices in InterfaceRun[ 1 ].
+   * Checked QNumber conservation.
+      - Quantum number LeptonNumber NOT conserved in the following vertices
+          {Spbar, ebar, F0}
+          {Sp, F0, e}
+      - Quantum number Q conserved in all vertices.
+   * particles.py written.
+   * parameters.py written.
+#
+# Vertex definitions
+#
+
+   * 80 vertices written.
+   * vertices.py written.
+#
+# Lorentz structure definitions
+#
+
+   * 17 lorentz structures written.
+   * lorentz.py written.
+#
+# Coupling definitions
+#
+
+   * 54 couplings written.
+   * couplings.py written.
+#
+# Coupling order definitions
+#
+
+   * 0 couplings orders written.
+   * coupling_orders.py written.
