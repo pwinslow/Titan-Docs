@@ -21,35 +21,44 @@ Software Setup
 
 Once you've logged into titan, you should be in your home directory (You can check this with the ``pwd`` command, which should return ``/home/your-username``). Here you should create a folder called ``local`` with the cmd ``mkdir ~/local``. Once you've done this, cd into ``local``, open a file with your favorite text editor, and copy and paste the following script into it ::
 
-	ATLAS_LOCAL_ROOT_BASE=/cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase
-	source ${ATLAS_LOCAL_ROOT_BASE}/user/atlasLocalSetup.sh
-	localSetupROOT
+	#!/bin/bash
 
-and save it as ``setupROOT``. Once you've closed the text editor, change the permissions on this file to make it an executable by typing ``chmod +x setupROOT``. While still in the **local** folder, open the text editor again and copy and paste the following script into it ::
-
+	# Install Python
 	if [ -d "$HOME/local/anaconda" ]
 	then
-	printf "\nAnaconda Python already installed...\n"
+	echo ''
+	echo 'Anaconda Python already installed...'
+	echo ''
 	else
-	# Download Anaconda and install
-	printf "\nInstalling Anaconda Python Distribution...\n"
+	echo ''
+	echo 'Installing Anaconda Python Distribution...'
+	echo ''
 	cd $HOME/local
 	wget https://3230d63b5fc54e62148e-c95ac804525aac4b6dba79b00b39d1d3.ssl.cf1.rackcdn.com/Anaconda-2.3.0-Linux-x86_64.sh
 	bash Anaconda-2.3.0-Linux-x86_64.sh -b -p $HOME/local/anaconda
-	# Clean up and append local anaconda distribution to python path
 	rm Anaconda-2.3.0-Linux-x86_64.sh
-	printf '\nexport PYTHONPATH="$HOME/local/anaconda/lib/python2.7/site-packages:{$PYTHONPATH}"\n' >> $HOME/.zshenv
-	printf '\nexport PATH="$HOME/local/anaconda/bin:$PATH"\n' >> $HOME/.bashrc
-	printf "\nDone installing Anaconda Python...\n"
+	echo '' >> $HOME/.zshenv
+	echo 'export PYTHONPATH="$HOME/local/anaconda/lib/python2.7/site-packages:{$PYTHONPATH}"' >> $HOME/.zshenv
+	echo '' >> $HOME/.bashrc
+	echo 'export PATH="$HOME/local/anaconda/bin:$PATH"' >> $HOME/.bashrc
+	echo '' >> $HOME/.bash_profile
+	echo 'source ~/.zshenv' >> $HOME/.bash_profile
+	echo ''
+	echo 'Done installing Anaconda Python...'
 	fi
-	source $HOME/.bash_profile
-	bash
 
-and save it as ``setupPYTHON``. Using the same cmd as before, make this file an executable as well. 
+	# Install ROOT environment variables
+	echo ''
+	echo 'Installing ROOT environment variables...'
+	echo ''
+	echo "" | tee -a $HOME/.zshrc $HOME/.zshenv $HOME/.bashrc > /dev/null
+	echo "export ATLAS_LOCAL_ROOT_BASE=/cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase" | tee -a $HOME/.zshrc $HOME/.zshenv $HOME/.bashrc > /dev/null
+	echo 'alias setupATLAS="source ${ATLAS_LOCAL_ROOT_BASE}/user/atlasLocalSetup.sh"' | tee -a $HOME/.zshrc $HOME/.zshenv $HOME/.bashrc > /dev/null
+	echo "export ALRB_localConfigDir=${HOME}/localConfig" | tee -a $HOME/.zshrc $HOME/.zshenv $HOME/.bashrc > /dev/null
+	echo 'Done installing ROOT environment variables...'
 
-The ``setupROOT`` script installs root. However, this install is not a proper install in the sense that it doesn't install it locally to a cluster node in any way. It just references an existing installation of root made available to you by CERN. The ``setupPYTHON`` script first checks to see if python is locally installed already and, if not, then it installs it. You only need to install python once but you will need to run ``setupROOT`` each time you want to use root. 
+and save it as ``setup.sh``. Once you've closed the text editor, change the permissions on this file to make it an executable by typing ``chmod +x setup.sh``. The ``setup.sh`` script first checks to see if python is locally installed already and, if not, then it installs it. Once that's done, it then sets a number of environment variables necessary for you to access root from CERN through titan. If you're just getting started for the first time, then just run ``setup.sh`` with the cmd ``./setup.sh`` from the ``local`` folder to install python and set up your environment for access to root [#]_. This process will likely take a minute. After this, python will be locally installed but, before you can use it, you need to first log out and then log back into titan. This action sources all the new environment settings which lets titan know where python and all its libraries are installed.
 
-If you're just getting started for the first time, then just run ``setupPYTHON`` with the cmd ``./setupPYTHON`` from the ``local`` folder to install python. This process will likely take a minute. After this, python will be locally installed and you should be able to use it with **ONE IMPORTANT CAVEAT**: each time you sign into titan you need to type ``source ~/.zshenv`` before being able to use python again. Without this, you will likely see errors of the form ``ImportError: undefined symbol: PyUnicodeUCS2_AsUnicodeEscapeString``. These indicate that there are two python distributions. The new one you just installed and a much older version with no useful modules. Running ``source ~/.zshenv`` when you login just tells titan to use the new python.
+The Anaconda Python distribution installs almost all scientific modules you could want when using python. However, if you find you have need of python modules that aren't currently installed, just type ``conda install **module-name**`` at the cmd line. For example, the beautiful soup module is very helpful for scraping data directly off of webpages and can be installed with the cmd ``conda install beautiful-soup``. The Anaconda distribution will also keep track of all dependencies so you don't have to worry about version requirements or any other such issues.
 
-The Anaconda distribution installs python and almost all scientific modules you could want with it. However, if you find you have need of python modules that aren't currently installed, just type ``conda install **module-name**`` at the cmd line. For example, the beautiful soup module is very helpful for scraping data directly off of webpages and can be installed with the cmd ``conda install beautiful-soup``. The Anaconda distribution will also keep track of all dependencies so you don't have to worry about version requirements or any other such issues.
-
+.. [#] You may see a warning about setting your PYTHONPATH environment variables during this process. This warning can be safely ignored as the script should have set all these variables for you.

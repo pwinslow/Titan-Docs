@@ -146,35 +146,51 @@
 <div class="section" id="software-setup">
 <h2>Software Setup<a class="headerlink" href="#software-setup" title="Permalink to this headline">¶</a></h2>
 <p>Once you&#8217;ve logged into titan, you should be in your home directory (You can check this with the <code class="docutils literal"><span class="pre">pwd</span></code> command, which should return <code class="docutils literal"><span class="pre">/home/your-username</span></code>). Here you should create a folder called <code class="docutils literal"><span class="pre">local</span></code> with the cmd <code class="docutils literal"><span class="pre">mkdir</span> <span class="pre">~/local</span></code>. Once you&#8217;ve done this, cd into <code class="docutils literal"><span class="pre">local</span></code>, open a file with your favorite text editor, and copy and paste the following script into it</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>ATLAS_LOCAL_ROOT_BASE=/cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase
-source ${ATLAS_LOCAL_ROOT_BASE}/user/atlasLocalSetup.sh
-localSetupROOT
-</pre></div>
-</div>
-<p>and save it as <code class="docutils literal"><span class="pre">setupROOT</span></code>. Once you&#8217;ve closed the text editor, change the permissions on this file to make it an executable by typing <code class="docutils literal"><span class="pre">chmod</span> <span class="pre">+x</span> <span class="pre">setupROOT</span></code>. While still in the <strong>local</strong> folder, open the text editor again and copy and paste the following script into it</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>if [ -d &quot;$HOME/local/anaconda&quot; ]
+<div class="highlight-default"><div class="highlight"><pre><span></span>#!/bin/bash
+
+# Install Python
+if [ -d &quot;$HOME/local/anaconda&quot; ]
 then
-printf &quot;\nAnaconda Python already installed...\n&quot;
+echo &#39;&#39;
+echo &#39;Anaconda Python already installed...&#39;
+echo &#39;&#39;
 else
-# Download Anaconda and install
-printf &quot;\nInstalling Anaconda Python Distribution...\n&quot;
+echo &#39;&#39;
+echo &#39;Installing Anaconda Python Distribution...&#39;
+echo &#39;&#39;
 cd $HOME/local
 wget https://3230d63b5fc54e62148e-c95ac804525aac4b6dba79b00b39d1d3.ssl.cf1.rackcdn.com/Anaconda-2.3.0-Linux-x86_64.sh
 bash Anaconda-2.3.0-Linux-x86_64.sh -b -p $HOME/local/anaconda
-# Clean up and append local anaconda distribution to python path
 rm Anaconda-2.3.0-Linux-x86_64.sh
-printf &#39;\nexport PYTHONPATH=&quot;$HOME/local/anaconda/lib/python2.7/site-packages:{$PYTHONPATH}&quot;\n&#39; &gt;&gt; $HOME/.zshenv
-printf &#39;\nexport PATH=&quot;$HOME/local/anaconda/bin:$PATH&quot;\n&#39; &gt;&gt; $HOME/.bashrc
-printf &quot;\nDone installing Anaconda Python...\n&quot;
+echo &#39;&#39; &gt;&gt; $HOME/.zshenv
+echo &#39;export PYTHONPATH=&quot;$HOME/local/anaconda/lib/python2.7/site-packages:{$PYTHONPATH}&quot;&#39; &gt;&gt; $HOME/.zshenv
+echo &#39;&#39; &gt;&gt; $HOME/.bashrc
+echo &#39;export PATH=&quot;$HOME/local/anaconda/bin:$PATH&quot;&#39; &gt;&gt; $HOME/.bashrc
+echo &#39;&#39; &gt;&gt; $HOME/.bash_profile
+echo &#39;source ~/.zshenv&#39; &gt;&gt; $HOME/.bash_profile
+echo &#39;&#39;
+echo &#39;Done installing Anaconda Python...&#39;
 fi
-source $HOME/.bash_profile
-bash
+
+# Install ROOT environment variables
+echo &#39;&#39;
+echo &#39;Installing ROOT environment variables...&#39;
+echo &#39;&#39;
+echo &quot;&quot; | tee -a $HOME/.zshrc $HOME/.zshenv $HOME/.bashrc &gt; /dev/null
+echo &quot;export ATLAS_LOCAL_ROOT_BASE=/cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase&quot; | tee -a $HOME/.zshrc $HOME/.zshenv $HOME/.bashrc &gt; /dev/null
+echo &#39;alias setupATLAS=&quot;source ${ATLAS_LOCAL_ROOT_BASE}/user/atlasLocalSetup.sh&quot;&#39; | tee -a $HOME/.zshrc $HOME/.zshenv $HOME/.bashrc &gt; /dev/null
+echo &quot;export ALRB_localConfigDir=${HOME}/localConfig&quot; | tee -a $HOME/.zshrc $HOME/.zshenv $HOME/.bashrc &gt; /dev/null
+echo &#39;Done installing ROOT environment variables...&#39;
 </pre></div>
 </div>
-<p>and save it as <code class="docutils literal"><span class="pre">setupPYTHON</span></code>. Using the same cmd as before, make this file an executable as well.</p>
-<p>The <code class="docutils literal"><span class="pre">setupROOT</span></code> script installs root. However, this install is not a proper install in the sense that it doesn&#8217;t install it locally to a cluster node in any way. It just references an existing installation of root made available to you by CERN. The <code class="docutils literal"><span class="pre">setupPYTHON</span></code> script first checks to see if python is locally installed already and, if not, then it installs it. You only need to install python once but you will need to run <code class="docutils literal"><span class="pre">setupROOT</span></code> each time you want to use root.</p>
-<p>If you&#8217;re just getting started for the first time, then just run <code class="docutils literal"><span class="pre">setupPYTHON</span></code> with the cmd <code class="docutils literal"><span class="pre">./setupPYTHON</span></code> from the <code class="docutils literal"><span class="pre">local</span></code> folder to install python. This process will likely take a minute. After this, python will be locally installed and you should be able to use it with <strong>ONE IMPORTANT CAVEAT</strong>: each time you sign into titan you need to type <code class="docutils literal"><span class="pre">source</span> <span class="pre">~/.zshenv</span></code> before being able to use python again. Without this, you will likely see errors of the form <code class="docutils literal"><span class="pre">ImportError:</span> <span class="pre">undefined</span> <span class="pre">symbol:</span> <span class="pre">PyUnicodeUCS2_AsUnicodeEscapeString</span></code>. These indicate that there are two python distributions. The new one you just installed and a much older version with no useful modules. Running <code class="docutils literal"><span class="pre">source</span> <span class="pre">~/.zshenv</span></code> when you login just tells titan to use the new python.</p>
-<p>The Anaconda distribution installs python and almost all scientific modules you could want with it. However, if you find you have need of python modules that aren&#8217;t currently installed, just type <code class="docutils literal"><span class="pre">conda</span> <span class="pre">install</span> <span class="pre">**module-name**</span></code> at the cmd line. For example, the beautiful soup module is very helpful for scraping data directly off of webpages and can be installed with the cmd <code class="docutils literal"><span class="pre">conda</span> <span class="pre">install</span> <span class="pre">beautiful-soup</span></code>. The Anaconda distribution will also keep track of all dependencies so you don&#8217;t have to worry about version requirements or any other such issues.</p>
+<p>and save it as <code class="docutils literal"><span class="pre">setup.sh</span></code>. Once you&#8217;ve closed the text editor, change the permissions on this file to make it an executable by typing <code class="docutils literal"><span class="pre">chmod</span> <span class="pre">+x</span> <span class="pre">setup.sh</span></code>. The <code class="docutils literal"><span class="pre">setup.sh</span></code> script first checks to see if python is locally installed already and, if not, then it installs it. Once that&#8217;s done, it then sets a number of environment variables necessary for you to access root from CERN through titan. If you&#8217;re just getting started for the first time, then just run <code class="docutils literal"><span class="pre">setup.sh</span></code> with the cmd <code class="docutils literal"><span class="pre">./setup.sh</span></code> from the <code class="docutils literal"><span class="pre">local</span></code> folder to install python and set up your environment for access to root <a class="footnote-reference" href="#id3" id="id2">[1]</a>. This process will likely take a minute. After this, python will be locally installed but, before you can use it, you need to first log out and then log back into titan. This action sources all the new environment settings which lets titan know where python and all its libraries are installed.</p>
+<p>The Anaconda Python distribution installs almost all scientific modules you could want when using python. However, if you find you have need of python modules that aren&#8217;t currently installed, just type <code class="docutils literal"><span class="pre">conda</span> <span class="pre">install</span> <span class="pre">**module-name**</span></code> at the cmd line. For example, the beautiful soup module is very helpful for scraping data directly off of webpages and can be installed with the cmd <code class="docutils literal"><span class="pre">conda</span> <span class="pre">install</span> <span class="pre">beautiful-soup</span></code>. The Anaconda distribution will also keep track of all dependencies so you don&#8217;t have to worry about version requirements or any other such issues.</p>
+<table class="docutils footnote" frame="void" id="id3" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id2">[1]</a></td><td>You may see a warning about setting your PYTHONPATH environment variables during this process. This warning can be safely ignored as the script should have set all these variables for you.</td></tr>
+</tbody>
+</table>
 </div>
 </div>
 
