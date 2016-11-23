@@ -14,7 +14,7 @@ In this tutorial, we'll be using MadGraph to generate collision events for a spe
 Installations
 -------------
 
-To get started, we need to setup root. To do this, log into titan and type ``setupATLAS`` and, once this is done running, type ``localSetupROOT``. Now that root is available, cd into the ``local`` folder, open a text editor, paste in the following script ::
+To get started, we'll first install MadGraph and Pythia. Once this is done, we'll have to set up root and then install Delphes. In order to set up MadGraph and Pythia, log into titan, cd into the ``local`` folder, open a text editor, paste in the following script ::
 
 	#!/bin/bash
 
@@ -47,6 +47,12 @@ To get started, we need to setup root. To do this, log into titan and type ``set
 	echo 'Building Pythia. This may take a little while...'
 	echo ''
 	make all
+	echo ''
+	echo 'Finished MadGraph+Pythia setup...'
+
+save it as ``MGsetup.sh``, make it an executable with ``chmod +x MGsetup.sh``, and run it with ``./MGsetup.sh``. This script will first download a fresh copy of MadGraph and unpack it. It then will download the FeynRules-generated BSM model we'll work with and place it in the ``models`` folder so we can use it. After this, it will download and install pythia in the main ``MG5_aMC_v2_4_3`` folder. 
+
+In order to install Delphes, we need to first setup root. To do this, type ``setupATLAS`` and, once this is done running, type ``localSetupROOT``. Root should now be available to you and you can start it by typing ``root`` [#]_. To install Delphes, cd into the ``local`` folder, open a text editor, paste in the following script ::
 
 	echo ''
 	echo 'Downloading Delphes...'
@@ -66,32 +72,94 @@ To get started, we need to setup root. To do this, log into titan and type ``set
 	wget -P $HOME/local/delphes/cards https://raw.githubusercontent.com/pwinslow/Machine-Learning-Projects/master/Lepton-Number-Violation-at-100-TeV/Data_Production/PW_FCC_delphes_card.tcl
 	
 	echo ''
-	echo 'Finished MadGraph+Pythia+Delphes setup...'
+	echo 'Finished Delphes setup...'
 
-save it as ``MGsetup.sh``, make it an executable with ``chmod +x MGsetup.sh``, and run it with ``./MGsetup.sh``. This script will first download a fresh copy of MadGraph and unpack it. It then will download the FeynRules-generated BSM model we'll work with and place it in the ``models`` folder so we can use it. After this, it will download and install pythia in the main ``MG5_aMC_v2_4_3`` folder and then install delphes in the ``local`` folder. Finally, it will download the specially designed tcl script mentioned above to simulate a detector in a 100 TeV hadron collider and place it in the delphes cards folder. 
+save it as ``DELPHESsetup.sh``, make it an executable with ``chmod +x DELPHESsetup.sh``, and run it with ``./DELPHESsetup.sh``. This script will install Delphes in the ``local`` folder and download the specially designed tcl script mentioned above to simulate a detector in a 100 TeV hadron collider and place it in the delphes cards folder. 
 
-To test our installation, open the MadGraph interface in the ``MG5_aMC_v2_4_3`` folder and type ``./bin/mg5_aMC``. Once in, type in the following cmds one-by-one ::
+**Note:** in order to properly set all environment variables for the rest of the analysis, you should now log out and then back into titan before continuing.
+
+-----------------------
+Parallelized Simulation
+-----------------------
+
+In this section, we'll take a simple BSM process and run it on the titan cluster for a single point in the BSM parameter space. To begin, cd to the ``local`` folder, open a text editor, paste in the following script ::
 
 	import model LNVatLHC_UFO
-	generate p p > sp f0 f0 @1
-	add process p p > sp f0 f0 j @2
+	generate p p > sp~ sp @1
+	add process p p > sp sp~ j @2
 	output testrun
-	exit
 
-Once you've exited the MadGraph interface, cd into the ``testrun`` folder and create a Pythia card with ``cp Cards/pythia_card_default.dat Cards/pythia_card.dat``. We can now perform a simulation of the hard scattering, showering, and hadronization of our process by modifying the collider energies of both beams to be 50000.0 GeV in the ``Cards/run_card.dat`` file and then running the cmd ``./bin/generate_events 0 testrun_1``. This should generate parton-level events and shower and hadronize the results with Pythia. To simulate the effects of a 100 TeV detector, we'll run Delphes on the ``tag_1_pythia_events.hep.gz`` file in the ``Events/testrun_1/`` folder with the following cmds, which should be run one-by-one from the ``testrun`` folder ::
+and save it as ``mgscript.cmd``. To run it, cd into the ``MG5_aMC_v2_4_3`` folder and type the cmd ``./bin/mg5_aMC ../mgscript.cmd``. This will create MadGraph output in the ``testrun`` folder for pair production of two new charged scalars. In order to demonstrate how to run parallel simulations of this process on titan, cd back to the ``local`` folder, open a text editor, paste in the following script ::
 
-	gunzip Events/testrun_1/tag_1_pythia_events.hep.gz
-	../../delphes/DelphesSTDHEP ../../delphes/cards/PW_FCC_delphes_card.tcl Events/testrun_1/delphes_output.root Events/testrun_1/tag_1_pythia_events.hep
-	../../delphes/root2lhco Events/testrun_1/delphes_output.root Events/testrun_1/delphes_output.lhco
+	#/bin/sh
 
-The result of these cmds will be the creation of ``tag_1_delphes_events.root`` and ``tag_1_delphes_events.lhco`` files in the ``Events/testrun_1`` folder, which contain the final form of all the simulated events.
+	MGbase=$HOME/local/MG5_aMC_v2_4_3
+	Base=$HOME/MGjobs
+	mkdir $Base
 
-----------------------------------------------
-Setting up for Partial Parallelized Simulation
-----------------------------------------------
+	for (( i=1; i<=5; i++ ));
+	do
 
-In this section, we'll take the process laid out in the last section and run it on the titan cluster for a single parameter point.
+	jobBase=$Base/job$i
+	cardBase=$jobBase/MG5_aMC_v2_4_3/testrun/Cards
+
+	mkdir $jobBase
+	cp -r $MGbase $jobBase
+
+	cd $jobBase
+
+	echo "" >> bout.log
+	echo "" >> berr.log
+
+	echo "#/bin/sh" >> MGscript.sh
+	echo "#PBS -N LNVjob$i" >> MGscript.sh
+	echo "echo 'seed: $i'" >> MGscript.sh
+	echo "printenv" >> MGscript.sh
+	echo "$jobBase/MG5_aMC_v2_4_3/testrun/bin/generate_events 0 run$i" >> MGscript.sh
+
+	cp $jobBase/MG5_aMC_v2_4_3/testrun/Cards/pythia_card_default.dat $jobBase/MG5_aMC_v2_4_3/testrun/Cards/pythia_card.dat
+	sed -i "33s/.*/      $i       = iseed   ! rnd seed (0=assigned automatically=default))/" $jobBase/MG5_aMC_v2_4_3/testrun/Cards/run_card.dat
+
+	chmod +x MGscript.sh
+	qsub -e berr.log -o bout.log MGscript.sh
+
+	done
+
+save it as ``MGbatch.sh``, make it an executable with ``chmod +x MGbatch.sh``, and run it with ``./MGbatch.sh``. This script will run 5 separate MadGraph instances simultaneously which each generate 10,000 parton level events and then shower, hadronize, and match the results with Pythia. 
+
+Once all these jobs are done running, i.e., none of the jobs show up when you type ``qstat`` anymore, then we need to run Delphes on each of these files. This cannot be done in a parallel manner with the current state of the titan cluster but we can still run it locally. To do this, cd back to the ``local`` folder, open a text editor, paste in the following script ::
+
+	#!/bin/bash
+
+	DelphesBase=$HOME/local/delphes
+
+	for (( i=1; i<=5; i++ ));
+	do
+
+	echo ''
+	echo "Running Delphes on run$i..."
+
+	EventBase=$HOME/MGjobs/job$i/MG5_aMC_v2_4_3/testrun/Events/run$i
+
+	gunzip $EventBase/tag_1_pythia_events.hep.gz
+	$DelphesBase/DelphesSTDHEP $DelphesBase/cards/PW_FCC_delphes_card.tcl $EventBase/delphes_output.root $EventBase/tag_1_pythia_events.hep
+	$DelphesBase/root2lhco $EventBase/delphes_output.root $EventBase/delphes_output.lhco
+
+	done
+
+	echo ''
+	echo 'Done...'
+
+save it as ``runDELPHES.sh`` and make it an executable with ``chmod +x runDELPHES.sh``. Now, after setting up root again by typing ``setupATLAS`` and then ``localSetupROOT``, run this script with ``./runDELPHES.sh``. This will go into each ``Events`` folder, one by one, and run Delphes on the existing pythia.hep files to produce both root and lhco files using the specialized 100 TeV tcl Delphes card. If everything ran correctly, there should now be a delphes_output.root and delphes_root.lhco file in each of the Events/run folders.
+
+--------------
+Final Comments
+--------------
+
+This concludes the tutorial on how to perform distributed MadGraph + Pythia + Delphes simulations of a BSM FeynRules model on the titan cluster. In order to expand on this for your own research, you'll need your own FeynRules UFO model folder. In order to make changes to run_card.dat or param_card.dat in a parallel manner, add extra ``sed`` commands into the ``MGbatch.sh`` script. 
+
+If you have any questions or problems with the above procedure, feel free to contact `me <mailto:pwinslow@physics.umass.edu>`_.
 
 
 
-.. [#] MadGraph may ask if you want to install a newer version. Type ``n`` to keep working with the downloaded version, the newest MadGraph hasn't been tested for this tutorial.
+.. [#] To quit root, type .q.
