@@ -37,7 +37,6 @@ Once you've logged into titan, you should be in your home directory (You can che
 	wget https://3230d63b5fc54e62148e-c95ac804525aac4b6dba79b00b39d1d3.ssl.cf1.rackcdn.com/Anaconda-2.3.0-Linux-x86_64.sh
 	bash Anaconda-2.3.0-Linux-x86_64.sh -b -p $HOME/local/anaconda
 	rm Anaconda-2.3.0-Linux-x86_64.sh
-	echo '' >> $HOME/.zshenv
 	echo 'export PYTHONPATH="$HOME/local/anaconda/lib/python2.7/site-packages:{$PYTHONPATH}"' >> $HOME/.zshenv
 	echo '' >> $HOME/.bashrc
 	echo 'export PATH="$HOME/local/anaconda/bin:$PATH"' >> $HOME/.bashrc
@@ -50,15 +49,15 @@ Once you've logged into titan, you should be in your home directory (You can che
 	# Install ROOT environment variables
 	echo ''
 	echo 'Installing ROOT environment variables...'
-	echo ''
-	echo "" | tee -a $HOME/.zshrc $HOME/.zshenv $HOME/.bashrc > /dev/null
-	echo "export ATLAS_LOCAL_ROOT_BASE=/cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase" | tee -a $HOME/.zshrc $HOME/.zshenv $HOME/.bashrc > /dev/null
-	echo 'alias setupATLAS="source ${ATLAS_LOCAL_ROOT_BASE}/user/atlasLocalSetup.sh"' | tee -a $HOME/.zshrc $HOME/.zshenv $HOME/.bashrc > /dev/null
-	echo "export ALRB_localConfigDir=${HOME}/localConfig" | tee -a $HOME/.zshrc $HOME/.zshenv $HOME/.bashrc > /dev/null
+	echo '' >> $HOME/.zshenv
+	echo 'export ROOTSYS=/home/willocq/root/root_v5.34.21/root' >> $HOME/.zshenv
+	echo 'export PATH="$ROOTSYS/bin:$PATH"' >> $HOME/.zshenv
+	echo 'export LD_LIBRARY_PATH="$ROOTSYS/lib:/home/willocq/bin/hepmc/x86_64-slc6-gcc45-opt/lib:$LD_LIBRARY_PATH"' >> $HOME/.zshenv
 	echo 'Done installing ROOT environment variables...'
 
-and save it as ``setup.sh``. Once you've closed the text editor, change the permissions on this file to make it an executable by typing ``chmod +x setup.sh``. The ``setup.sh`` script first checks to see if python is locally installed already and, if not, then it installs it. Once that's done, it then sets a number of environment variables necessary for you to access root from CERN through titan. If you're just getting started for the first time, then just run ``setup.sh`` with the cmd ``./setup.sh`` from the ``local`` folder to install python and set up your environment for access to root [#]_. This process will likely take a minute. After this, python will be locally installed but, before you can use it, you need to first log out and then log back into titan. This action sources all the new environment settings which lets titan know where python and all its libraries are installed.
+and save it as ``setup.sh``. Once you've closed the text editor, change the permissions on this file to make it an executable by typing ``chmod +x setup.sh``. The ``setup.sh`` script first checks to see if python is locally installed already and, if not, then it installs it. Once that's done, it then sets a number of environment variables necessary for you to access root [#]_. If you're just getting started for the first time, then just run ``setup.sh`` with the cmd ``./setup.sh`` from the ``local`` folder to install python and set up your environment for access to root [#]_. This process will likely take a minute. After this, both python and root will be locally installed and accessible but, before you can use them, you need to first log out and then log back into titan. This action sources all the new environment settings which lets titan know where all relevant libraries are installed.
 
 The Anaconda Python distribution installs almost all scientific modules you could want when using python. However, if you find you have need of python modules that aren't currently installed, just type ``conda install **module-name**`` at the cmd line. For example, the beautiful soup module is very helpful for scraping data directly off of webpages and can be installed with the cmd ``conda install beautiful-soup``. The Anaconda distribution will also keep track of all dependencies so you don't have to worry about version requirements or any other such issues.
 
+.. [#] Thanks very much to Haolin Li for pointing out the root installation on titan, allowing us to bypass using the installation from CERN.
 .. [#] You may see a warning about setting your PYTHONPATH environment variables during this process. This warning can be safely ignored as the script should have set all these variables for you.

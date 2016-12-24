@@ -144,7 +144,7 @@
 </div>
 <div class="section" id="installations">
 <h2>Installations<a class="headerlink" href="#installations" title="Permalink to this headline">¶</a></h2>
-<p>To get started, we&#8217;ll first install MadGraph and Pythia. Once this is done, we&#8217;ll have to set up root and then install Delphes. In order to set up MadGraph and Pythia, log into titan, cd into the <code class="docutils literal"><span class="pre">local</span></code> folder, open a text editor, paste in the following script</p>
+<p>Here, we&#8217;ll install MadGraph, Pythia, and Delphes. In order to set everything up, log into titan, cd into the <code class="docutils literal"><span class="pre">local</span></code> folder, open a text editor, paste in the following script</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span>#!/bin/bash
 
 echo &#39;&#39;
@@ -152,7 +152,7 @@ echo &#39;Downloading MadGraph...&#39;
 echo &#39;&#39;
 wget -P $HOME/local https://launchpad.net/mg5amcnlo/2.0/2.4.x/+download/MG5_aMC_v2.4.3.tar.gz
 cd $HOME/local
-tar -xzf MG5_aMC_v2.4.3.tar.gz
+tar xzf MG5_aMC_v2.4.3.tar.gz
 sed -i -e &#39;s/# auto_update = 7/auto_update = 0/g&#39; MG5_aMC_v2_4_3/input/mg5_configuration.txt
 sed -i -e &#39;s/# automatic_html_opening = True/automatic_html_opening = False/g&#39; MG5_aMC_v2_4_3/input/mg5_configuration.txt
 rm MG5_aMC_v2.4.3.tar.gz
@@ -170,41 +170,34 @@ echo &#39;&#39;
 wget -O $HOME/local/MG5_aMC_v2_4_3/pythia-pgs.tar.gz http://madgraph.phys.ucl.ac.be/Downloads/pythia-pgs_V2.4.5.tar.gz
 cd $HOME/local/MG5_aMC_v2_4_3/
 tar xzf pythia-pgs.tar.gz
-rm pythia-pgs.tar.gz
-cd pythia-pgs/src
+rm pythia-pgs.tar.gzcd pythia-pgs/src
 echo &#39;&#39;
 echo &#39;Building Pythia. This may take a little while...&#39;
 echo &#39;&#39;
 make all
+
 echo &#39;&#39;
-echo &#39;Finished MadGraph+Pythia setup...&#39;
-</pre></div>
-</div>
-<p>save it as <code class="docutils literal"><span class="pre">MGsetup.sh</span></code>, make it an executable with <code class="docutils literal"><span class="pre">chmod</span> <span class="pre">+x</span> <span class="pre">MGsetup.sh</span></code>, and run it with <code class="docutils literal"><span class="pre">./MGsetup.sh</span></code>. This script will first download a fresh copy of MadGraph and unpack it. It then will download the FeynRules-generated BSM model we&#8217;ll work with and place it in the <code class="docutils literal"><span class="pre">models</span></code> folder so we can use it. After this, it will download and install pythia in the main <code class="docutils literal"><span class="pre">MG5_aMC_v2_4_3</span></code> folder.</p>
-<p>In order to install Delphes, we need to first setup root. To do this, type <code class="docutils literal"><span class="pre">setupATLAS</span></code> and, once this is done running, type <code class="docutils literal"><span class="pre">localSetupROOT</span></code>. Root should now be available to you and you can start it by typing <code class="docutils literal"><span class="pre">root</span></code> <a class="footnote-reference" href="#id2" id="id1">[1]</a>. To install Delphes, cd into the <code class="docutils literal"><span class="pre">local</span></code> folder, open a text editor, paste in the following script</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>echo &#39;&#39;
 echo &#39;Downloading Delphes...&#39;
-echo &#39;&#39;
-cd $HOME/local
-git clone https://github.com/delphes/delphes.git
+wget -O $HOME/local/MG5_aMC_v2_4_3/Delphes.tar.gz http://cp3.irmp.ucl.ac.be/downloads/Delphes-3-current.tar.gz
+cd $HOME/local/MG5_aMC_v2_4_3/
+tar xzf Delphes.tar.gz
+rm Delphes.tar.gz
+mv Delphes-3.3.3 Delphes
+cd Delphes
 echo &#39;&#39;
 echo &#39;Building Delphes. This may take a little while...&#39;
 echo &#39;&#39;
-cd delphes
 make
-echo &#39;&#39;
-echo &#39;Finished installing Delphes...&#39;
 
+echo &#39;&#39;
 echo &#39;Downloading 100 TeV delphes detector simulation card...&#39;
 echo &#39;&#39;
-wget -P $HOME/local/delphes/cards https://raw.githubusercontent.com/pwinslow/Machine-Learning-Projects/master/Lepton-Number-Violation-at-100-TeV/Data_Production/PW_FCC_delphes_card.tcl
-
+wget -P $HOME/local/MG5_aMC_v2_4_3/Delphes/cards https://raw.githubusercontent.com/pwinslow/Machine-Learning-Projects/master/Lepton-Number-Violation-at-100-TeV/Data_Production/PW_FCC_delphes_card.tcl
 echo &#39;&#39;
-echo &#39;Finished Delphes setup...&#39;
+echo &#39;Finished MadGraph+Pythia+Delphes setup...&#39;
 </pre></div>
 </div>
-<p>save it as <code class="docutils literal"><span class="pre">DELPHESsetup.sh</span></code>, make it an executable with <code class="docutils literal"><span class="pre">chmod</span> <span class="pre">+x</span> <span class="pre">DELPHESsetup.sh</span></code>, and run it with <code class="docutils literal"><span class="pre">./DELPHESsetup.sh</span></code>. This script will install Delphes in the <code class="docutils literal"><span class="pre">local</span></code> folder and download the specially designed tcl script mentioned above to simulate a detector in a 100 TeV hadron collider and place it in the delphes cards folder.</p>
-<p><strong>Note:</strong> in order to properly set all environment variables for the rest of the analysis, you should now log out and then back into titan before continuing.</p>
+<p>save it as <code class="docutils literal"><span class="pre">MGsetup.sh</span></code>, make it an executable with <code class="docutils literal"><span class="pre">chmod</span> <span class="pre">+x</span> <span class="pre">MGsetup.sh</span></code>, and run it with <code class="docutils literal"><span class="pre">./MGsetup.sh</span></code>. This script will first download a fresh copy of MadGraph and unpack it. It then will download the FeynRules-generated BSM model we&#8217;ll work with and place it in the <code class="docutils literal"><span class="pre">models</span></code> folder so we can use it. After this, it will download and install both pythia and Delphes in the main <code class="docutils literal"><span class="pre">MG5_aMC_v2_4_3</span></code> folder. Finally, it will download the specially designed tcl script mentioned above to simulate a detector in a 100 TeV hadron collider and place it in the delphes cards folder.</p>
 </div>
 <div class="section" id="parallelized-simulation">
 <h2>Parallelized Simulation<a class="headerlink" href="#parallelized-simulation" title="Permalink to this headline">¶</a></h2>
@@ -243,6 +236,7 @@ echo &quot;printenv&quot; &gt;&gt; MGscript.sh
 echo &quot;$jobBase/MG5_aMC_v2_4_3/testrun/bin/generate_events 0 run$i&quot; &gt;&gt; MGscript.sh
 
 cp $jobBase/MG5_aMC_v2_4_3/testrun/Cards/pythia_card_default.dat $jobBase/MG5_aMC_v2_4_3/testrun/Cards/pythia_card.dat
+cp $jobBase/MG5_aMC_v2_4_3/Delphes/cards/PW_FCC_delphes_card.tcl $jobBase/MG5_aMC_v2_4_3/testrun/Cards/delphes_card.dat
 sed -i &quot;33s/.*/      $i       = iseed   ! rnd seed (0=assigned automatically=default))/&quot; $jobBase/MG5_aMC_v2_4_3/testrun/Cards/run_card.dat
 
 chmod +x MGscript.sh
@@ -251,40 +245,16 @@ qsub -e berr.log -o bout.log MGscript.sh
 done
 </pre></div>
 </div>
-<p>save it as <code class="docutils literal"><span class="pre">MGbatch.sh</span></code>, make it an executable with <code class="docutils literal"><span class="pre">chmod</span> <span class="pre">+x</span> <span class="pre">MGbatch.sh</span></code>, and run it with <code class="docutils literal"><span class="pre">./MGbatch.sh</span></code>. This script will run 5 separate MadGraph instances simultaneously which each generate 10,000 parton level events and then shower, hadronize, and match the results with Pythia.</p>
-<p>Once all these jobs are done running, i.e., none of the jobs show up when you type <code class="docutils literal"><span class="pre">qstat</span></code> anymore, then we need to run Delphes on each of these files. This cannot be done in a parallel manner with the current state of the titan cluster but we can still run it locally. To do this, cd back to the <code class="docutils literal"><span class="pre">local</span></code> folder, open a text editor, paste in the following script</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>#!/bin/bash
-
-DelphesBase=$HOME/local/delphes
-
-for (( i=1; i&lt;=5; i++ ));
-do
-
-echo &#39;&#39;
-echo &quot;Running Delphes on run$i...&quot;
-
-EventBase=$HOME/MGjobs/job$i/MG5_aMC_v2_4_3/testrun/Events/run$i
-
-gunzip $EventBase/tag_1_pythia_events.hep.gz
-$DelphesBase/DelphesSTDHEP $DelphesBase/cards/PW_FCC_delphes_card.tcl $EventBase/delphes_output.root $EventBase/tag_1_pythia_events.hep
-$DelphesBase/root2lhco $EventBase/delphes_output.root $EventBase/delphes_output.lhco
-
-done
-
-echo &#39;&#39;
-echo &#39;Done...&#39;
-</pre></div>
-</div>
-<p>save it as <code class="docutils literal"><span class="pre">runDELPHES.sh</span></code> and make it an executable with <code class="docutils literal"><span class="pre">chmod</span> <span class="pre">+x</span> <span class="pre">runDELPHES.sh</span></code>. Now, after setting up root again by typing <code class="docutils literal"><span class="pre">setupATLAS</span></code> and then <code class="docutils literal"><span class="pre">localSetupROOT</span></code>, run this script with <code class="docutils literal"><span class="pre">./runDELPHES.sh</span></code>. This will go into each <code class="docutils literal"><span class="pre">Events</span></code> folder, one by one, and run Delphes on the existing pythia.hep files to produce both root and lhco files using the specialized 100 TeV tcl Delphes card. If everything ran correctly, there should now be a delphes_output.root and delphes_root.lhco file in each of the Events/run folders.</p>
+<p>save it as <code class="docutils literal"><span class="pre">MGbatch.sh</span></code>, make it an executable with <code class="docutils literal"><span class="pre">chmod</span> <span class="pre">+x</span> <span class="pre">MGbatch.sh</span></code>, and run it with <code class="docutils literal"><span class="pre">./MGbatch.sh</span></code>. This script will run 5 separate MadGraph instances simultaneously which each generate 10,000 parton level events which are then showered, hadronized, and matched with Pythia, and then run Delphes on the existing pythia.hep files to produce both root and lhco files using the specialized 100 TeV tcl Delphes card. Once all these jobs are done running, i.e., none of the jobs show up when you type <code class="docutils literal"><span class="pre">qstat</span></code> anymore, there should be delphes_output.root and delphes_root.lhco files in each of the Events/run folders.</p>
 </div>
 <div class="section" id="final-comments">
 <h2>Final Comments<a class="headerlink" href="#final-comments" title="Permalink to this headline">¶</a></h2>
 <p>This concludes the tutorial on how to perform distributed MadGraph + Pythia + Delphes simulations of a BSM FeynRules model on the titan cluster. In order to expand on this for your own research, you&#8217;ll need your own FeynRules UFO model folder. In order to make changes to run_card.dat or param_card.dat in a parallel manner, add extra <code class="docutils literal"><span class="pre">sed</span></code> commands into the <code class="docutils literal"><span class="pre">MGbatch.sh</span></code> script.</p>
 <p>If you have any questions or problems with the above procedure, feel free to contact <a class="reference external" href="mailto:pwinslow&#37;&#52;&#48;physics&#46;umass&#46;edu">me</a>.</p>
-<table class="docutils footnote" frame="void" id="id2" rules="none">
+<table class="docutils footnote" frame="void" id="id1" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>To quit root, type .q.</td></tr>
+<tr><td class="label">[1]</td><td>To quit root, type .q.</td></tr>
 </tbody>
 </table>
 </div>

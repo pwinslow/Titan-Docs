@@ -162,7 +162,6 @@ cd $HOME/local
 wget https://3230d63b5fc54e62148e-c95ac804525aac4b6dba79b00b39d1d3.ssl.cf1.rackcdn.com/Anaconda-2.3.0-Linux-x86_64.sh
 bash Anaconda-2.3.0-Linux-x86_64.sh -b -p $HOME/local/anaconda
 rm Anaconda-2.3.0-Linux-x86_64.sh
-echo &#39;&#39; &gt;&gt; $HOME/.zshenv
 echo &#39;export PYTHONPATH=&quot;$HOME/local/anaconda/lib/python2.7/site-packages:{$PYTHONPATH}&quot;&#39; &gt;&gt; $HOME/.zshenv
 echo &#39;&#39; &gt;&gt; $HOME/.bashrc
 echo &#39;export PATH=&quot;$HOME/local/anaconda/bin:$PATH&quot;&#39; &gt;&gt; $HOME/.bashrc
@@ -175,20 +174,25 @@ fi
 # Install ROOT environment variables
 echo &#39;&#39;
 echo &#39;Installing ROOT environment variables...&#39;
-echo &#39;&#39;
-echo &quot;&quot; | tee -a $HOME/.zshrc $HOME/.zshenv $HOME/.bashrc &gt; /dev/null
-echo &quot;export ATLAS_LOCAL_ROOT_BASE=/cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase&quot; | tee -a $HOME/.zshrc $HOME/.zshenv $HOME/.bashrc &gt; /dev/null
-echo &#39;alias setupATLAS=&quot;source ${ATLAS_LOCAL_ROOT_BASE}/user/atlasLocalSetup.sh&quot;&#39; | tee -a $HOME/.zshrc $HOME/.zshenv $HOME/.bashrc &gt; /dev/null
-echo &quot;export ALRB_localConfigDir=${HOME}/localConfig&quot; | tee -a $HOME/.zshrc $HOME/.zshenv $HOME/.bashrc &gt; /dev/null
+echo &#39;&#39; &gt;&gt; $HOME/.zshenv
+echo &#39;export ROOTSYS=/home/willocq/root/root_v5.34.21/root&#39; &gt;&gt; $HOME/.zshenv
+echo &#39;export PATH=&quot;$ROOTSYS/bin:$PATH&quot;&#39; &gt;&gt; $HOME/.zshenv
+echo &#39;export LD_LIBRARY_PATH=&quot;$ROOTSYS/lib:/home/willocq/bin/hepmc/x86_64-slc6-gcc45-opt/lib:$LD_LIBRARY_PATH&quot;&#39; &gt;&gt; $HOME/.zshenv
 echo &#39;Done installing ROOT environment variables...&#39;
 </pre></div>
 </div>
-<p>and save it as <code class="docutils literal"><span class="pre">setup.sh</span></code>. Once you&#8217;ve closed the text editor, change the permissions on this file to make it an executable by typing <code class="docutils literal"><span class="pre">chmod</span> <span class="pre">+x</span> <span class="pre">setup.sh</span></code>. The <code class="docutils literal"><span class="pre">setup.sh</span></code> script first checks to see if python is locally installed already and, if not, then it installs it. Once that&#8217;s done, it then sets a number of environment variables necessary for you to access root from CERN through titan. If you&#8217;re just getting started for the first time, then just run <code class="docutils literal"><span class="pre">setup.sh</span></code> with the cmd <code class="docutils literal"><span class="pre">./setup.sh</span></code> from the <code class="docutils literal"><span class="pre">local</span></code> folder to install python and set up your environment for access to root <a class="footnote-reference" href="#id3" id="id2">[1]</a>. This process will likely take a minute. After this, python will be locally installed but, before you can use it, you need to first log out and then log back into titan. This action sources all the new environment settings which lets titan know where python and all its libraries are installed.</p>
+<p>and save it as <code class="docutils literal"><span class="pre">setup.sh</span></code>. Once you&#8217;ve closed the text editor, change the permissions on this file to make it an executable by typing <code class="docutils literal"><span class="pre">chmod</span> <span class="pre">+x</span> <span class="pre">setup.sh</span></code>. The <code class="docutils literal"><span class="pre">setup.sh</span></code> script first checks to see if python is locally installed already and, if not, then it installs it. Once that&#8217;s done, it then sets a number of environment variables necessary for you to access root <a class="footnote-reference" href="#id4" id="id2">[1]</a>. If you&#8217;re just getting started for the first time, then just run <code class="docutils literal"><span class="pre">setup.sh</span></code> with the cmd <code class="docutils literal"><span class="pre">./setup.sh</span></code> from the <code class="docutils literal"><span class="pre">local</span></code> folder to install python and set up your environment for access to root <a class="footnote-reference" href="#id5" id="id3">[2]</a>. This process will likely take a minute. After this, both python and root will be locally installed and accessible but, before you can use them, you need to first log out and then log back into titan. This action sources all the new environment settings which lets titan know where all relevant libraries are installed.</p>
 <p>The Anaconda Python distribution installs almost all scientific modules you could want when using python. However, if you find you have need of python modules that aren&#8217;t currently installed, just type <code class="docutils literal"><span class="pre">conda</span> <span class="pre">install</span> <span class="pre">**module-name**</span></code> at the cmd line. For example, the beautiful soup module is very helpful for scraping data directly off of webpages and can be installed with the cmd <code class="docutils literal"><span class="pre">conda</span> <span class="pre">install</span> <span class="pre">beautiful-soup</span></code>. The Anaconda distribution will also keep track of all dependencies so you don&#8217;t have to worry about version requirements or any other such issues.</p>
-<table class="docutils footnote" frame="void" id="id3" rules="none">
+<table class="docutils footnote" frame="void" id="id4" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id2">[1]</a></td><td>You may see a warning about setting your PYTHONPATH environment variables during this process. This warning can be safely ignored as the script should have set all these variables for you.</td></tr>
+<tr><td class="label"><a class="fn-backref" href="#id2">[1]</a></td><td>Thanks very much to Haolin Li for pointing out the root installation on titan, allowing us to bypass using the installation from CERN.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id5" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id3">[2]</a></td><td>You may see a warning about setting your PYTHONPATH environment variables during this process. This warning can be safely ignored as the script should have set all these variables for you.</td></tr>
 </tbody>
 </table>
 </div>
